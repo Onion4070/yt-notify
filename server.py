@@ -7,11 +7,28 @@ app = Flask(__name__)
 
 
 @app.route("/")
-def hello():
-    return "Hello World"
+def root():
+    return "Hello Flask Server", 200
+
+
+@app.route("/webhook", methods=["GET", "POST"])
+def callback():
+    # GET: challengeでの検証(購読確認)
+    if request.method == "GET":
+        challenge = request.args.get("hub.challenge")
+        return challenge, 200
+    
+    # POST: ハブからの更新通知
+    if request.method == "POST":
+        xml = request.data # Atom/RSS XML
+        print("\n========== New Notify ==========\n")
+        print(request.headers)
+        print(request.data.decode())
+
+        return "", 204
 
 
 if __name__ == "__main__":
     print("Server listening localhost:8080...")
     app.run("0.0.0.0", port=8080)
-    # serve(app, host="0.0.0.0", port=8080, threads=4)
+    #serve(app, host="0.0.0.0", port=8080, threads=4)
