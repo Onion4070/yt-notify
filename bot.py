@@ -7,9 +7,7 @@ load_dotenv('.env')
 TOKEN      = os.getenv('DISCORD_TOKEN')
 CHANNEL_ID = os.getenv('DISCORD_CHANNEL_ID')
 
-def notify():
-    msg = "Hello World"
-
+def notify(msg):
     header = {
         'authorization':f'Bot {TOKEN}', 
         'content-type':'application/json'
@@ -22,4 +20,4 @@ def notify():
     req.post(url, data=payload, headers=header)
 
 if __name__ == '__main__':
-    notify()
+    notify("Hello World")

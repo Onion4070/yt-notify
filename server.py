@@ -2,6 +2,7 @@ from waitress import serve
 from flask import Flask
 from flask import request
 
+import bot
 
 app = Flask(__name__)
 
@@ -21,6 +22,7 @@ def callback():
     # POST: ハブからの更新通知
     if request.method == "POST":
         xml = request.data # Atom/RSS XML
+        bot.notify(xml.decode())
         print("\n========== New Notify ==========\n")
         print(request.headers)
         print(request.data.decode())
