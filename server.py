@@ -1,10 +1,11 @@
+from dataclasses import asdict
+
 from waitress import serve
 from flask import Flask
 from flask import request
 
 import bot
 import handler 
-
 
 app = Flask(__name__)
 
@@ -26,11 +27,11 @@ def callback():
         xml = request.data # Atom/RSS XML
         #bot.notify(xml.decode())
         print("\n========== New Notify ==========\n")
-        #print(handler.xml_parse(xml))
         video_data = handler.xml_parse(xml)
-        print(video_data.status)
-        print('\n==========  RAW XML  ==========\n')
-        print(request.data.decode())
+        for k, v in asdict(video_data).items():
+            print(f'{k}: {v}')
+        #print('\n==========  RAW XML  ==========\n')
+        #print(request.data.decode())
 
         return "", 204
 

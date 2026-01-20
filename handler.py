@@ -5,6 +5,8 @@ from datetime import datetime
 from dateutil.parser import parse
 from dateutil.tz import gettz
 
+import youtube_api
+
 
 class VideoStatus(Enum):
     VIDEO    = 'video'
@@ -74,9 +76,19 @@ def xml_parse(xml: bytes):
     name = author.find('atom:name', XML_NAMESPACE).text
     channel_uri  = author.find('atom:uri',  XML_NAMESPACE).text
 
+    live_status = youtube_api.get_live_status(video_id)
+    print(f'live status = {live_status}')
+
+    # デフォルト値は通常動画
     status = VideoStatus.VIDEO
+
+    # 各種状態判定
     if ('/shorts' in link):
         status = VideoStatus.SHORT
+    elif (live_status == 'upcoming'):
+        status = VideoStatus.UPCOMING
+    elif (live_status == 'live'):
+        status = VideoStats.LIVE
     
     return VideoData(
         title, 
@@ -87,8 +99,4 @@ def xml_parse(xml: bytes):
         published, 
         updated,
         status
-    )
-
-
-def get_live_status(video_id: str) -> str:
-    pass 
+    ) 
