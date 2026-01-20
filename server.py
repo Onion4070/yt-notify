@@ -26,7 +26,9 @@ def callback():
         xml = request.data # Atom/RSS XML
         #bot.notify(xml.decode())
         print("\n========== New Notify ==========\n")
-        print(handler.xml_parse(xml))
+        #print(handler.xml_parse(xml))
+        video_data = handler.xml_parse(xml)
+        print(video_data)
         print('\n==========  RAW XML  ==========\n')
         print(request.data.decode())
 
