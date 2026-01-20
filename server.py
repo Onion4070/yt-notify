@@ -3,6 +3,8 @@ from flask import Flask
 from flask import request
 
 import bot
+import handler 
+
 
 app = Flask(__name__)
 
@@ -22,9 +24,10 @@ def callback():
     # POST: ハブからの更新通知
     if request.method == "POST":
         xml = request.data # Atom/RSS XML
-        bot.notify(xml.decode())
+        #bot.notify(xml.decode())
         print("\n========== New Notify ==========\n")
-        print(request.headers)
+        print(handler.xml_parse(xml))
+        print('\n==========  RAW XML  ==========\n')
         print(request.data.decode())
 
         return "", 204
