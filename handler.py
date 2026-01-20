@@ -88,7 +88,7 @@ def xml_parse(xml: bytes):
     elif (live_status == 'upcoming'):
         status = VideoStatus.UPCOMING
     elif (live_status == 'live'):
-        status = VideoStats.LIVE
+        status = VideoStatus.LIVE
     
     return VideoData(
         title, 
