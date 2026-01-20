@@ -28,7 +28,7 @@ def callback():
         print("\n========== New Notify ==========\n")
         #print(handler.xml_parse(xml))
         video_data = handler.xml_parse(xml)
-        print(video_data)
+        print(video_data.status)
         print('\n==========  RAW XML  ==========\n')
         print(request.data.decode())
 

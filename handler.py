@@ -1,8 +1,18 @@
 from dataclasses import dataclass
+from enum import Enum
 import xml.etree.cElementTree as ET
 from datetime import datetime
 from dateutil.parser import parse
 from dateutil.tz import gettz
+
+
+class VideoStatus(Enum):
+    VIDEO    = 'video'
+    SHORT    = 'short'
+    LIVE     = 'live'
+    UPCOMING = 'upcoming'
+    DELETED  = 'deleted'
+
 
 @dataclass(frozen=True)
 class VideoData:
@@ -13,6 +23,7 @@ class VideoData:
     channel_uri: str
     published: datetime
     updated: datetime
+    status: VideoStatus
 
 
 def xml_parse(xml: bytes):
@@ -46,7 +57,8 @@ def xml_parse(xml: bytes):
             name, 
             channel_uri, 
             published, 
-            updated
+            updated, 
+            status=VideoStatus.DELETED
         )
 
     # 通常の通知
@@ -62,6 +74,10 @@ def xml_parse(xml: bytes):
     name = author.find('atom:name', XML_NAMESPACE).text
     channel_uri  = author.find('atom:uri',  XML_NAMESPACE).text
 
+    status = VideoStatus.VIDEO
+    if ('/shorts' in link):
+        status = VideoStatus.SHORT
+    
     return VideoData(
         title, 
         link, 
@@ -69,5 +85,10 @@ def xml_parse(xml: bytes):
         name, 
         channel_uri, 
         published, 
-        updated
+        updated,
+        status
     )
+
+
+def get_live_status(video_id: str) -> str:
+    pass 
