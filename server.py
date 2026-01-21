@@ -1,3 +1,4 @@
+import time
 from dataclasses import asdict
 
 from waitress import serve
@@ -27,9 +28,14 @@ def callback():
         xml = request.data # Atom/RSS XML
         #bot.notify(xml.decode())
         print("\n========== New Notify ==========\n")
+        time.sleep(3)
         video_data = handler.xml_parse(xml)
-        for k, v in asdict(video_data).items():
-            print(f'{k}: {v}')
+        msg = '\n'.join(
+            f'{k}: {v}' for k, v in asdict(video_data).items()
+        )
+        print(msg)
+        bot.notify(msg)
+
         #print('\n==========  RAW XML  ==========\n')
         #print(request.data.decode())
 
