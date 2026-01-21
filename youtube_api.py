@@ -21,9 +21,6 @@ async def get_json(video_id: str):
 
 async def get_live_status(video_id: str):
     res_json = await get_json(video_id)
-    print(res_json)
-    items = res_json['items']
-    item  = items[0]
     live_status = res_json['items'][0]['snippet']['liveBroadcastContent']
     # live     -> 'live', 
     # upcoming -> 'upcoming'
@@ -34,8 +31,6 @@ async def get_live_status(video_id: str):
 async def main():
     res_json = await get_json(VIDEO_ID)
     status = await get_live_status(VIDEO_ID)
-    #print(res_json)
-    #print(status)
 
 if __name__ == '__main__':
     asyncio.run(main())
