@@ -9,7 +9,7 @@ KEY = os.getenv('YOUTUBE_API_KEY')
 VIDEO_ID = os.getenv('TEST_VIDEO_ID')
 
 
-async def get_json(video_id: str):
+async def fetch(video_id: str):
     url = f'https://www.googleapis.com/youtube/v3/videos?part=contentDetails,statistics,snippet&id={video_id}&key={KEY}'
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
@@ -19,8 +19,22 @@ async def get_json(video_id: str):
                 return f'error: status code {response.status}'
 
 
+async def fetch_with_retry(video_id: str):
+    for wait in [3, 3, 4]:
+        res_json = await fetch(video_id)
+
+        live_status = res_json['items'][0]['snippet']['liveBroadcastContent']
+
+        # upcoming, liveはAPIが最新の情報を取っていない可能性あり
+        if live_status == 'upcoming' or live_status == 'live':
+            await asyncio.sleep(wait)
+            print('retry fetch...')
+
+    return res_json
+
+
 async def get_live_status(video_id: str):
-    res_json = await get_json(video_id)
+    res_json = await fetch_with_retry(video_id)
     live_status = res_json['items'][0]['snippet']['liveBroadcastContent']
     # live     -> 'live', 
     # upcoming -> 'upcoming'
