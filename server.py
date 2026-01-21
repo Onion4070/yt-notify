@@ -12,12 +12,12 @@ app = Flask(__name__)
 
 
 @app.route("/")
-def root():
+async def root():
     return "Hello Flask Server", 200
 
 
 @app.route("/webhook", methods=["GET", "POST"])
-def callback():
+async def callback():
     # GET: challengeでの検証(購読確認)
     if request.method == "GET":
         challenge = request.args.get("hub.challenge")
@@ -28,8 +28,7 @@ def callback():
         xml = request.data # Atom/RSS XML
         #bot.notify(xml.decode())
         print("\n========== New Notify ==========\n")
-        time.sleep(3)
-        video_data = handler.xml_parse(xml)
+        video_data = await handler.xml_parse(xml)
         msg = '\n'.join(
             f'{k}: {v}' for k, v in asdict(video_data).items()
         )

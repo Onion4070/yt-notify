@@ -1,3 +1,5 @@
+import asyncio
+import os
 from dataclasses import dataclass
 from enum import Enum
 import xml.etree.cElementTree as ET
@@ -6,7 +8,6 @@ from dateutil.parser import parse
 from dateutil.tz import gettz
 
 import youtube_api
-
 
 class VideoStatus(Enum):
     VIDEO    = 'video'
@@ -28,7 +29,7 @@ class VideoData:
     status: VideoStatus
 
 
-def xml_parse(xml: bytes):
+async def xml_parse(xml: bytes):
     # 名前空間の定義
     ## デフォルト: atom, 動画削除に関してはatの名前空間が利用される
     XML_NAMESPACE = {
@@ -64,6 +65,7 @@ def xml_parse(xml: bytes):
         )
 
     # 通常の通知
+    print('normal entry')
     entry = root.find('atom:entry', XML_NAMESPACE)
 
     title     = entry.find('atom:title',  XML_NAMESPACE).text
@@ -76,7 +78,7 @@ def xml_parse(xml: bytes):
     name = author.find('atom:name', XML_NAMESPACE).text
     channel_uri  = author.find('atom:uri',  XML_NAMESPACE).text
 
-    live_status = youtube_api.get_live_status(video_id)
+    live_status = await youtube_api.get_live_status(video_id)
     print(f'live status = {live_status}')
 
     # デフォルト値は通常動画
@@ -100,3 +102,33 @@ def xml_parse(xml: bytes):
         updated,
         status
     ) 
+
+
+async def main():
+    xml = b"""<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns="http://www.w3.org/2005/Atom">
+    <link rel="hub" href="https://pubsubhubbub.appspot.com" />
+    <link rel="self"
+        href="https://www.youtube.com/xml/feeds/videos.xml?channel_id=UCnnL8tPKzfrHnbkWJtXY0wg" />
+    <title>YouTube video feed</title>
+    <updated>2026-01-19T02:39:48.809894593+00:00</updated>
+    <entry>
+        <id>yt:video:9t18yl0NwGo</id>
+        <yt:videoId>9t18yl0NwGo</yt:videoId>
+        <yt:channelId>UCnnL8tPKzfrHnbkWJtXY0wg</yt:channelId>
+        <title>test</title>
+        <link rel="alternate" href="https://www.youtube.com/shorts/9t18yl0NwGo" />
+        <author>
+            <name>maybeOnion</name>
+            <uri>https://www.youtube.com/channel/UCnnL8tPKzfrHnbkWJtXY0wg</uri>
+        </author>
+        <published>2026-01-19T01:54:47+00:00</published>
+        <updated>2026-01-19T02:39:48.809894593+00:00</updated>
+    </entry>
+</feed>
+"""
+    data = await xml_parse(xml)
+
+
+if __name__ == '__main__':
+    asyncio.run(main())
